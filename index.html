@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f0f1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>L.A.I. Studio NEXUS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+  <link rel="stylesheet" href="assets/css/lai-theme.css">
+  <style>
+    /* Loader iniziale */
+    .app-loader {
+      position: fixed;
+      inset: 0;
+      background: var(--lai-bg-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+    .app-loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loader-logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--lai-primary) 0%, var(--lai-primary-dark) 100%);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--lai-bg-dark);
+      box-shadow: var(--shadow-glow);
+      animation: loaderPulse 1.5s ease infinite;
+    }
+    @keyframes loaderPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .loader-text {
+      margin-top: var(--space-lg);
+      font-size: 14px;
+      color: var(--lai-text-secondary);
+      letter-spacing: 2px;
+    }
+    .loader-version {
+      margin-top: var(--space-xs);
+      font-size: 12px;
+      color: var(--lai-text-muted);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader -->
+  <div class="app-loader" id="loader">
+    <div class="loader-logo">L</div>
+    <div class="loader-text">L.A.I. STUDIO NEXUS</div>
+    <div class="loader-version">v3.1.0</div>
+  </div>
+
+  <!-- App Container -->
+  <div class="app-container" id="app" style="display:none;">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-logo">
+        <div class="app-logo-icon">L</div>
+        <div>
+          <div class="app-logo-text">L.A.I. <span>NEXUS</span></div>
+        </div>
+      </div>
+      <div class="status-badge online" id="nodeStatus">
+        <span class="status-dot"></span>
+        <span id="statusText">NODO ATTIVO</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main style="padding: var(--space-md); padding-bottom: 80px;">
+
+      <!-- SEZIONE DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content animate-fade-in">
+        <!-- Dashboard Metrics -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Dashboard Sistema</div>
+                <div class="card-subtitle">Stato in tempo reale</div>
+              </div>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="metric-value" id="metricNodes">--</div>
+                <div class="metric-label">Nodi Attivi</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value" id="metricTasks">--</div>
+                <div class="metric-label">Task in Coda</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value" id="metricUptime">--</div>
+                <div class="metric-label">Uptime</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value" id="metricVersion">3.1</div>
+                <div class="metric-label">Versione</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Azioni Rapide</div>
+                <div class="card-subtitle">Collegamenti diretti</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-sm);">
+              <button class="btn btn-primary" onclick="openHealth()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>
+                Health Check
+              </button>
+              <button class="btn btn-secondary" onclick="openCloudflare()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.922V6.893L1 4.239v8.033l6.5 2.65z"/></svg>
+                Cloudflare
+              </button>
+              <button class="btn btn-secondary" onclick="openFolder()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 1l.007.5h3.674z"/></svg>
+                Cartella LAI
+              </button>
+              <button class="btn btn-secondary" onclick="runTest()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/></svg>
+                Test Suite
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Node Info -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Informazioni Nodo</div>
+                <div class="card-subtitle">Dettaglio configurazione</div>
+              </div>
+            </div>
+            <div id="nodeInfo" style="font-family: var(--font-mono); font-size: 12px; color: var(--lai-text-secondary); line-height: 1.8;">
+              Caricamento...
+            </div>
+          </div>
+        </section>
+
+        <!-- Audit Log Preview -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Audit Recenti</div>
+                <div class="card-subtitle">Ultime operazioni tracciate</div>
+              </div>
+            </div>
+            <div id="auditPreview" style="font-family: var(--font-mono); font-size: 11px; color: var(--lai-text-muted);">
+              Nessun dato disponibile
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- SEZIONE TASK -->
+      <div id="tab-tasks" class="tab-content" style="display: none;">
+        <section class="animate-fade-in">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Gestione Task</div>
+                <div class="card-subtitle">Coda delle operazioni</div>
+              </div>
+              <button class="btn btn-primary" onclick="createNewTask()" style="padding: var(--space-xs) var(--space-sm); font-size: 12px;">Nuovo Task</button>
+            </div>
+            <div id="tasks-list" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+              <div style="text-align: center; color: var(--lai-text-secondary); padding: var(--space-lg) 0;">
+                Nessun task attivo.
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- SEZIONE AI -->
+      <div id="tab-ai" class="tab-content" style="display: none;">
+        <section class="animate-fade-in">
+          <div class="card" style="display: flex; flex-direction: column; height: 60vh; padding: var(--space-md); margin-bottom: 0;">
+            <div class="card-header" style="margin-bottom: var(--space-sm);">
+              <div>
+                <div class="card-title">L.A.I. AI Gateway</div>
+                <div class="card-subtitle">RAG + Modelli Avanzati (Ollama/Claude)</div>
+              </div>
+              <div class="status-badge online" id="ai-model-badge">
+                <span class="status-dot"></span>
+                <span id="ai-model-text">OLLAMA PROXY</span>
+              </div>
+            </div>
+            
+            <!-- Chat Area -->
+            <div id="chat-area" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-xs); margin-bottom: var(--space-md); border: 1px solid var(--lai-border); border-radius: var(--radius-md); background: rgba(0,0,0,0.15);">
+              <div style="background: var(--lai-bg-elevated); padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); max-width: 85%; align-self: flex-start; border-left: 3px solid var(--lai-primary);">
+                <div style="font-size: 13px; font-weight: 600; margin-bottom: 2px;">L.A.I. Assistant</div>
+                <div style="font-size: 13px; line-height: 1.5; color: var(--lai-text-primary);">
+                  Benvenuto in L.A.I. Studio NEXUS v3.1.<br>Chiedi pure per perizie, normativa catastale o controllo del server.
+                </div>
+              </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div style="display: flex; gap: var(--space-sm); align-items: center;">
+              <input type="text" id="chat-input" placeholder="Scrivi un messaggio per L.A.I..." 
+                     style="flex: 1; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-size: 14px;"
+                     onkeypress="if(event.key==='Enter')sendAiMessage()">
+              <button class="btn btn-primary" onclick="sendAiMessage()" style="padding: var(--space-sm) var(--space-md);">
+                Invia
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- SEZIONE IMPOSTAZIONI -->
+      <div id="tab-settings" class="tab-content" style="display: none;">
+        <section class="animate-fade-in">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Configurazione L.A.I.</div>
+                <div class="card-subtitle">Impostazioni di connessione al Nexus</div>
+              </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+              <div>
+                <label style="display: block; font-size: 12px; color: var(--lai-text-secondary); margin-bottom: var(--space-xs);">Endpoint Cloudflare Worker (Nexus URL)</label>
+                <input type="text" id="setting-nexus-url" placeholder="https://..." value="https://lai-nexus-v31.geom-corvino.workers.dev"
+                       style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-family: var(--font-mono); font-size: 13px;">
+              </div>
+              
+              <div id="settings-auth-status" style="border: 1px solid var(--lai-border); padding: var(--space-md); border-radius: var(--radius-md); background: rgba(0,0,0,0.1);">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: var(--space-sm);">Stato Autenticazione</div>
+                <div id="auth-info-box" style="font-size: 13px; color: var(--lai-text-secondary); margin-bottom: var(--space-md);">
+                  Non autenticato. Esegui il login per comunicare con il Nexus Cloud.
+                </div>
+                
+                <div id="settings-login-form" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                  <input type="email" id="login-email" placeholder="Email" style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-size: 13px;">
+                  <input type="password" id="login-password" placeholder="Password" style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-size: 13px;">
+                  <div id="login-error" style="color: var(--lai-error); font-size: 12px; display: none;"></div>
+                  <button class="btn btn-primary" id="login-btn" onclick="doLogin()" style="justify-content: center; margin-top: var(--space-xs);">Accedi al Cloud</button>
+                </div>
+                
+                <button class="btn btn-secondary" id="logout-btn" onclick="doLogout()" style="display: none; width: 100%; justify-content: center;">Disconnetti</button>
+              </div>
+
+              <div>
+                <label style="display: block; font-size: 12px; color: var(--lai-text-secondary); margin-bottom: var(--space-xs);">Nodo Locale (Flask URL)</label>
+                <input type="text" id="setting-node-url" placeholder="http://..." value="http://127.0.0.1:5000"
+                       style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-family: var(--font-mono); font-size: 13px;">
+              </div>
+              
+              <div style="font-size: 12px; color: var(--lai-text-muted); text-align: center; margin-top: var(--space-md);">
+                L.A.I. Studio NEXUS Dashboard v3.1.0 · Sviluppata in conformità con le specifiche L.A.I. Design System.
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="nav-bottom">
+      <a href="#" class="nav-item active" onclick="showSection('dashboard'); return false;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('tasks'); return false;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        Task
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('ai'); return false;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        AI
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('settings'); return false;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Impostazioni
+      </a>
+    </nav>
+
+  </div>
+
+  <script src="assets/js/lai-app.js"></script>
+</body>
+</html>
