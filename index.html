@@ -90,7 +90,54 @@
 
       <!-- SEZIONE DASHBOARD -->
       <div id="tab-dashboard" class="tab-content animate-fade-in">
-        <!-- Dashboard Metrics -->
+        <!-- Dashboard Operativa -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Dashboard Pratiche</div>
+                <div class="card-subtitle" id="current-date">Caricamento data...</div>
+              </div>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="metric-value" id="stat-totale">0</div>
+                <div class="metric-label">Pratiche Totali</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value" id="stat-inCorso">0</div>
+                <div class="metric-label">In Lavorazione</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value" id="stat-scadenti">0</div>
+                <div class="metric-label">In Scadenza (7gg)</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value" id="stat-concluse">0</div>
+                <div class="metric-label">Concluse</div>
+              </div>
+            </div>
+            <div style="margin-top: var(--space-md); text-align: center; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--lai-border); padding-top: var(--space-md);">
+              <div style="text-align: left;">
+                <span class="metric-label" style="margin-top:0;">Fatturato Mese Corrente:</span>
+                <span class="metric-value" id="stat-fatturato" style="font-size: 20px; display: block; font-family: var(--font-mono); color: var(--lai-primary); font-weight: bold;">€0</span>
+              </div>
+              <button class="btn btn-primary" onclick="openModal()" style="padding: var(--space-xs) var(--space-sm); font-size: 12px;">+ Nuova Pratica</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pratiche Recenti -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Pratiche Recenti</div>
+            </div>
+            <div id="recent-list" class="table-wrap"></div>
+          </div>
+        </section>
+
+        <!-- Dashboard Metrics (Sistema) -->
         <section>
           <div class="card">
             <div class="card-header">
@@ -181,6 +228,76 @@
         </section>
       </div>
 
+      <!-- SEZIONE PRATICHE -->
+      <div id="tab-pratiche" class="tab-content" style="display: none;">
+        <section class="animate-fade-in">
+          <div class="card">
+            <div class="card-header" style="flex-wrap: wrap; gap: var(--space-sm);">
+              <div>
+                <div class="card-title">Gestione Pratiche</div>
+                <div class="card-subtitle">Archivio delle pratiche di studio</div>
+              </div>
+              <div style="display: flex; gap: var(--space-sm); align-items: center; flex-wrap: wrap; margin-left: auto;">
+                <select id="filter-tipo" onchange="renderPratiche()" style="background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-sm); padding: 6px 12px; color: var(--lai-text-primary); font-size: 13px;">
+                  <option value="">Tutti i pacchetti</option>
+                  <option value="P1 — Conformità Pre-Rogito">P1 — Conformità Pre-Rogito</option>
+                  <option value="P2 — Sanatoria Salva Casa">P2 — Sanatoria Salva Casa</option>
+                  <option value="P3 — DOCFA Variazione">P3 — DOCFA Variazione</option>
+                  <option value="P4 — CILA">P4 — CILA</option>
+                  <option value="P4 — SCIA Ordinaria">P4 — SCIA Ordinaria</option>
+                  <option value="P4 — SCIA Alternativa">P4 — SCIA Alternativa</option>
+                  <option value="P5 — Due Diligence">P5 — Due Diligence</option>
+                  <option value="P6 — Perizia Tecnica">P6 — Perizia Tecnica</option>
+                  <option value="P7 — Pratica Complessa">P7 — Pratica Complessa</option>
+                </select>
+                <select id="filter-stato" onchange="renderPratiche()" style="background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-sm); padding: 6px 12px; color: var(--lai-text-primary); font-size: 13px;">
+                  <option value="">Tutti gli stati</option>
+                  <option value="In Lavorazione">In Lavorazione</option>
+                  <option value="In Attesa Comune">In Attesa Comune</option>
+                  <option value="In Attesa Cliente">In Attesa Cliente</option>
+                  <option value="Depositata">Depositata</option>
+                  <option value="Conclusa">Conclusa</option>
+                </select>
+                <input type="search" id="search-pratiche" placeholder="Cerca cliente o numero..." oninput="renderPratiche()" style="background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-sm); padding: 6px 12px; color: var(--lai-text-primary); font-size: 13px;">
+                <button class="btn btn-primary" onclick="openModal()">+ Nuova Pratica</button>
+              </div>
+            </div>
+            <div id="pratiche-list" class="table-wrap"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- SEZIONE CLIENTI -->
+      <div id="tab-clienti" class="tab-content" style="display: none;">
+        <section class="animate-fade-in">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Gestione Clienti</div>
+                <div class="card-subtitle">Anagrafica clienti dello studio</div>
+              </div>
+              <button class="btn btn-primary" onclick="openClienteModal()" style="margin-left: auto;">+ Nuovo Cliente</button>
+            </div>
+            <div id="clienti-list" class="table-wrap"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- SEZIONE SCADENZE -->
+      <div id="tab-scadenze" class="tab-content" style="display: none;">
+        <section class="animate-fade-in">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Scadenze Imminenti</div>
+                <div class="card-subtitle">Pratiche in scadenza nei prossimi giorni</div>
+              </div>
+            </div>
+            <div id="scadenze-list" class="table-wrap"></div>
+          </div>
+        </section>
+      </div>
+
       <!-- SEZIONE TASK -->
       <div id="tab-tasks" class="tab-content" style="display: none;">
         <section class="animate-fade-in">
@@ -254,7 +371,15 @@
               <div>
                 <label style="display: block; font-size: 12px; color: var(--lai-text-secondary); margin-bottom: var(--space-xs);">Endpoint Cloudflare Worker (Nexus URL)</label>
                 <input type="text" id="setting-nexus-url" placeholder="https://..." value="https://lai-nexus-v31.geom-corvino.workers.dev"
-                       style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-family: var(--font-mono); font-size: 13px;">
+                       style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-family: var(--font-mono); font-size: 13px;"
+                       onchange="saveNexusUrl()">
+              </div>
+              
+              <div>
+                <label style="display: block; font-size: 12px; color: var(--lai-text-secondary); margin-bottom: var(--space-xs);">Chiave API Personale AI (OpenRouter o Google Gemini)</label>
+                <input type="password" id="setting-api-key" placeholder="sk-or-... oppure AIzaSy..." value=""
+                       style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-family: var(--font-mono); font-size: 13px;"
+                       onchange="saveApiKey()">
               </div>
               
               <div id="settings-auth-status" style="border: 1px solid var(--lai-border); padding: var(--space-md); border-radius: var(--radius-md); background: rgba(0,0,0,0.1);">
@@ -276,7 +401,8 @@
               <div>
                 <label style="display: block; font-size: 12px; color: var(--lai-text-secondary); margin-bottom: var(--space-xs);">Nodo Locale (Flask URL)</label>
                 <input type="text" id="setting-node-url" placeholder="http://..." value="http://127.0.0.1:5000"
-                       style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-family: var(--font-mono); font-size: 13px;">
+                       style="width: 100%; background: var(--lai-bg-elevated); border: 1px solid var(--lai-border); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-md); color: var(--lai-text-primary); font-family: var(--font-mono); font-size: 13px;"
+                       onchange="saveNodeUrl()">
               </div>
               
               <div style="font-size: 12px; color: var(--lai-text-muted); text-align: center; margin-top: var(--space-md);">
@@ -289,11 +415,23 @@
 
     </main>
 
-    <!-- Bottom Navigation -->
+     <!-- Bottom Navigation -->
     <nav class="nav-bottom">
       <a href="#" class="nav-item active" onclick="showSection('dashboard'); return false;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         Dashboard
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('pratiche'); return false;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Pratiche
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('clienti'); return false;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m8-10a4 4 0 100-8 4 4 0 000 8zm11 10v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
+        Clienti
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('scadenze'); return false;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Scadenze
       </a>
       <a href="#" class="nav-item" onclick="showSection('tasks'); return false;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
@@ -309,6 +447,146 @@
       </a>
     </nav>
 
+  </div>
+
+  <!-- MODAL NUOVA PRATICA -->
+  <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Nuova Pratica</h2>
+        <button onclick="closeModal()" class="modal-close">✕</button>
+      </div>
+      <form id="pratica-form" onsubmit="savePratica(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Numero Pratica</label>
+            <input type="text" id="f-numero" placeholder="es. 2026-001" required>
+          </div>
+          <div class="form-group">
+            <label>Tipo Pratica (Pacchetto)</label>
+            <select id="f-tipo" required></select>
+          </div>
+          <div class="form-group full">
+            <label>Cliente</label>
+            <input type="text" id="f-cliente" placeholder="Nome e Cognome / Ragione Sociale" required>
+          </div>
+          <div class="form-group full">
+            <label>Oggetto / Descrizione</label>
+            <input type="text" id="f-oggetto" placeholder="es. Conformità pre-rogito – Via Roma 12, Aversa">
+          </div>
+          <div class="form-group">
+            <label>Comune</label>
+            <input type="text" id="f-comune" placeholder="Comune">
+          </div>
+          <div class="form-group">
+            <label>Foglio / Particella</label>
+            <input type="text" id="f-particella" placeholder="es. F.3 P.15">
+          </div>
+          <div class="form-group">
+            <label>Data Apertura</label>
+            <input type="date" id="f-apertura" required>
+          </div>
+          <div class="form-group">
+            <label>Scadenza</label>
+            <input type="date" id="f-scadenza">
+          </div>
+          <div class="form-group">
+            <label>Stato</label>
+            <select id="f-stato">
+              <option>In Lavorazione</option>
+              <option>In Attesa Comune</option>
+              <option>In Attesa Cliente</option>
+              <option>Depositata</option>
+              <option>Conclusa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Onorario (€)</label>
+            <input type="number" id="f-onorario" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>Acconto ricevuto (€)</label>
+            <input type="number" id="f-acconto" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>Responsabile (Trio)</label>
+            <select id="f-responsabile">
+              <option>Raffaele</option>
+              <option>Aurelio</option>
+              <option>Marco</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Esecutore</label>
+            <select id="f-esecutore">
+              <option>Satellite</option>
+              <option>Trio</option>
+              <option>Misto</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Collaboratore satellite</label>
+            <input type="text" id="f-collaboratore" placeholder="Nome collaboratore">
+          </div>
+          <div class="form-group">
+            <label>Referral (chi ha mandato il cliente)</label>
+            <input type="text" id="f-referral" placeholder="Es: Notaio Rossi, Agenzia Immobiliare XY">
+          </div>
+          <div class="form-group full">
+            <label>Note</label>
+            <textarea id="f-note" rows="3" placeholder="Annotazioni, documenti mancanti, riferimenti..."></textarea>
+          </div>
+        </div>
+        <input type="hidden" id="f-id">
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Annulla</button>
+          <button type="submit" class="btn-save">Salva Pratica</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CLIENTE -->
+  <div id="modal-cliente" class="modal-overlay" onclick="if(event.target===this)closeClienteModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Nuovo Cliente</h2>
+        <button onclick="closeClienteModal()" class="modal-close">✕</button>
+      </div>
+      <form id="cliente-form" onsubmit="saveCliente(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome / Ragione Sociale</label>
+            <input type="text" id="c-nome" required placeholder="Nome Cognome">
+          </div>
+          <div class="form-group">
+            <label>Codice Fiscale / P.IVA</label>
+            <input type="text" id="c-cf" placeholder="RSSMRA80A01F839D">
+          </div>
+          <div class="form-group">
+            <label>Telefono</label>
+            <input type="tel" id="c-tel" placeholder="+39 333 1234567">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="c-email" placeholder="email@esempio.it">
+          </div>
+          <div class="form-group full">
+            <label>Indirizzo</label>
+            <input type="text" id="c-indirizzo" placeholder="Via, Comune, CAP">
+          </div>
+          <div class="form-group full">
+            <label>Note</label>
+            <textarea id="c-note" rows="2"></textarea>
+          </div>
+        </div>
+        <input type="hidden" id="c-id">
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" onclick="closeClienteModal()">Annulla</button>
+          <button type="submit" class="btn-save">Salva Cliente</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="assets/js/lai-app.js"></script>
