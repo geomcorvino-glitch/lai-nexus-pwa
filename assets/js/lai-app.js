@@ -33,6 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
       app.style.display = 'block';
       app.classList.add('animate-fade-in');
     }
+    
+    // Gestione hash iniziale
+    const hash = window.location.hash.substring(1);
+    if (hash && ['dashboard', 'tasks', 'ai', 'settings', 'pratiche', 'clienti', 'scadenze'].includes(hash)) {
+      showSection(hash);
+    }
   }, 1200);
 
   // Esegui i controlli iniziali e avvia il polling
@@ -43,6 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Polling periodico
   setInterval(checkNodeStatus, 10000);  // Ogni 10 secondi per il nodo locale
   setInterval(checkNexusStatus, 30000); // Ogni 30 secondi per il Cloudflare Worker
+});
+
+// Ascolta cambiamenti hash
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.substring(1);
+  if (hash && ['dashboard', 'tasks', 'ai', 'settings', 'pratiche', 'clienti', 'scadenze'].includes(hash)) {
+    showSection(hash);
+  }
 });
 
 // Gestione della navigazione (Tab Switcher)
